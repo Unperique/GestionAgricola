@@ -2,16 +2,21 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
-# Contexto Delimitado: Cultivo
+#####################################
+# CONTEXTO DELIMITADO: CULTIVO
+#####################################
+
+# Modelo para gestionar las parcelas de tierra
 class Parcela(models.Model):
-    codigo = models.CharField(max_length=20, unique=True)
-    nombre = models.CharField(max_length=100)
-    superficie = models.DecimalField(max_digits=10, decimal_places=2)  # en hectáreas
-    ubicacion = models.CharField(max_length=255)
-    fecha_ultima_utilizacion = models.DateField(null=True, blank=True)
-    potencial_productivo = models.CharField(max_length=50)
-    coordenadas_gps = models.CharField(max_length=100, blank=True)  # Nuevo campo
-    tipo_suelo = models.CharField(max_length=50, blank=True)  # Nuevo campo
+    # Información básica de la parcela
+    codigo = models.CharField(max_length=20, unique=True)  # Identificador único de la parcela
+    nombre = models.CharField(max_length=100)  # Nombre descriptivo
+    superficie = models.DecimalField(max_digits=10, decimal_places=2)  # Tamaño en hectáreas
+    ubicacion = models.CharField(max_length=255)  # Ubicación física
+    fecha_ultima_utilizacion = models.DateField(null=True, blank=True)  # Último uso
+    potencial_productivo = models.CharField(max_length=50)  # Capacidad productiva
+    coordenadas_gps = models.CharField(max_length=100, blank=True)  # Ubicación GPS
+    tipo_suelo = models.CharField(max_length=50, blank=True)  # Tipo de suelo
     
     class Meta:
         verbose_name = 'Parcela'
@@ -21,16 +26,18 @@ class Parcela(models.Model):
     def __str__(self):
         return f"{self.codigo} - {self.nombre}"
 
+# Modelo para registrar análisis de suelo
 class AnalisisSuelo(models.Model):
-    parcela = models.ForeignKey(Parcela, on_delete=models.CASCADE, related_name='analisis')
-    fecha_analisis = models.DateField()
-    ph = models.DecimalField(max_digits=4, decimal_places=2)
-    materia_organica = models.DecimalField(max_digits=5, decimal_places=2)  # en porcentaje
-    nitrogeno = models.DecimalField(max_digits=6, decimal_places=2)  # en ppm
-    fosforo = models.DecimalField(max_digits=6, decimal_places=2)  # en ppm
-    potasio = models.DecimalField(max_digits=6, decimal_places=2)  # en ppm
-    otros_minerales = models.JSONField(null=True, blank=True)  # Otros minerales en formato JSON
-    observaciones = models.TextField(blank=True)
+    parcela = models.ForeignKey(Parcela, on_delete=models.CASCADE, related_name='analisis')  # Parcela analizada
+    fecha_analisis = models.DateField()  # Fecha del análisis
+    # Propiedades químicas del suelo
+    ph = models.DecimalField(max_digits=4, decimal_places=2)  # Nivel de pH
+    materia_organica = models.DecimalField(max_digits=5, decimal_places=2)  # Porcentaje
+    nitrogeno = models.DecimalField(max_digits=6, decimal_places=2)  # ppm
+    fosforo = models.DecimalField(max_digits=6, decimal_places=2)  # ppm
+    potasio = models.DecimalField(max_digits=6, decimal_places=2)  # ppm
+    otros_minerales = models.JSONField(null=True, blank=True)  # Otros minerales en JSON
+    observaciones = models.TextField(blank=True)  # Notas adicionales
     
     def __str__(self):
         return f"Análisis de {self.parcela} del {self.fecha_analisis}"
@@ -267,16 +274,20 @@ class UsoInsumo(models.Model):
     def __str__(self):
         return f"Uso de {self.lote_insumo} en {self.labor}"
 
-# Contexto Delimitado: Venta y Distribución
+#####################################
+# CONTEXTO DELIMITADO: VENTA Y DISTRIBUCIÓN
+#####################################
+
+# Modelo para gestionar clientes
 class Cliente(models.Model):
-    nombre = models.CharField(max_length=100)
-    tipo = models.CharField(max_length=50)  # Mayorista, Minorista, Exportador, etc.
-    ruc_dni = models.CharField(max_length=20, unique=True)
-    direccion = models.CharField(max_length=255)
-    telefono = models.CharField(max_length=20)
-    email = models.EmailField()
-    fecha_registro = models.DateField(auto_now_add=True)
-    notas = models.TextField(blank=True)
+    nombre = models.CharField(max_length=100)  # Nombre del cliente
+    tipo = models.CharField(max_length=50)  # Tipo: Mayorista, Minorista, etc.
+    ruc_dni = models.CharField(max_length=20, unique=True)  # Documento de identidad
+    direccion = models.CharField(max_length=255)  # Dirección física
+    telefono = models.CharField(max_length=20)  # Teléfono de contacto
+    email = models.EmailField()  # Correo electrónico
+    fecha_registro = models.DateField(auto_now_add=True)  # Fecha de registro automática
+    notas = models.TextField(blank=True)  # Notas adicionales
     
     def __str__(self):
         return self.nombre
@@ -543,15 +554,11 @@ class DetalleDevolucion(models.Model):
     def __str__(self):
         return f"Detalle devolución: {self.cantidad} de {self.detalle_pedido.producto}"
 
-# Contexto Delimitado: Gestión de Recursos
-class Cargo(models.Model):
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField(blank=True)
-    salario_base = models.DecimalField(max_digits=10, decimal_places=2)
-    
-    def __str__(self):
-        return self.nombre
+#####################################
+# CONTEXTO DELIMITADO: GESTIÓN DE RECURSOS
+#####################################
 
+# Modelo para gestionar trabajadores
 class Trabajador(models.Model):
     ESTADO_CHOICES = [
         ('activo', 'Activo'),
@@ -561,18 +568,23 @@ class Trabajador(models.Model):
         ('inactivo', 'Inactivo'),
     ]
 
-    codigo = models.CharField(max_length=20, unique=True)
-    nombre_completo = models.CharField(max_length=100)
-    documento_identidad = models.CharField(max_length=20, unique=True)
-    fecha_nacimiento = models.DateField()
-    direccion = models.CharField(max_length=255)
-    telefono = models.CharField(max_length=20)
-    email = models.EmailField(blank=True)
-    fecha_contratacion = models.DateField()
-    cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE)
-    estado = models.CharField(max_length=50, choices=ESTADO_CHOICES, default='activo')
-    foto = models.CharField(max_length=255, blank=True)  # Nuevo campo
-    contacto_emergencia = models.CharField(max_length=255, blank=True)  # Nuevo campo
+    # Información personal
+    codigo = models.CharField(max_length=20, unique=True)  # Código de empleado
+    nombre_completo = models.CharField(max_length=100)  # Nombre completo
+    documento_identidad = models.CharField(max_length=20, unique=True)  # DNI/Cédula
+    fecha_nacimiento = models.DateField()  # Fecha de nacimiento
+    
+    # Información de contacto
+    direccion = models.CharField(max_length=255)  # Dirección física
+    telefono = models.CharField(max_length=20)  # Teléfono
+    email = models.EmailField(blank=True)  # Correo electrónico
+    
+    # Información laboral
+    fecha_contratacion = models.DateField()  # Fecha de inicio
+    cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE)  # Cargo actual
+    estado = models.CharField(max_length=50, choices=ESTADO_CHOICES, default='activo')  # Estado laboral
+    foto = models.CharField(max_length=255, blank=True)  # Ruta de la foto
+    contacto_emergencia = models.CharField(max_length=255, blank=True)  # Contacto de emergencia
     
     class Meta:
         verbose_name = 'Trabajador'

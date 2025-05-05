@@ -1,74 +1,103 @@
+"""
+Configuración del panel de administración de Django para la aplicación agro_management.
+Este archivo define cómo se mostrarán y gestionarán los modelos en el panel de administración.
+"""
+
 from django.contrib import admin
 from .models import *
 
-# Cultivo
+#####################################
+# ADMINISTRACIÓN DE CULTIVOS
+#####################################
+
 @admin.register(Parcela)
 class ParcelaAdmin(admin.ModelAdmin):
-    list_display = ('codigo', 'nombre', 'superficie', 'ubicacion', 'fecha_ultima_utilizacion')
-    search_fields = ('codigo', 'nombre', 'ubicacion')
+    """Configuración de la vista de administración para Parcelas"""
+    list_display = ('codigo', 'nombre', 'superficie', 'ubicacion', 'fecha_ultima_utilizacion')  # Campos mostrados en la lista
+    search_fields = ('codigo', 'nombre', 'ubicacion')  # Campos para búsqueda
 
 @admin.register(Cultivo)
 class CultivoAdmin(admin.ModelAdmin):
-    list_display = ('variedad', 'parcela', 'fecha_siembra', 'fecha_cosecha_estimada')
-    search_fields = ('parcela__nombre', 'variedad__nombre')
-    list_filter = ('fecha_siembra',)
+    """Configuración de la vista de administración para Cultivos"""
+    list_display = ('variedad', 'parcela', 'fecha_siembra', 'fecha_cosecha_estimada')  # Campos mostrados en la lista
+    search_fields = ('parcela__nombre', 'variedad__nombre')  # Campos para búsqueda
+    list_filter = ('fecha_siembra',)  # Filtros disponibles
 
 @admin.register(TipoCultivo)
 class TipoCultivoAdmin(admin.ModelAdmin):
+    """Configuración de la vista de administración para Tipos de Cultivo"""
     list_display = ('nombre', 'categoria')
     search_fields = ('nombre',)
     list_filter = ('categoria',)
 
 @admin.register(Variedad)
 class VariedadAdmin(admin.ModelAdmin):
+    """Configuración de la vista de administración para Variedades de Cultivo"""
     list_display = ('nombre', 'tipo_cultivo', 'tiempo_maduracion', 'rendimiento_esperado')
     search_fields = ('nombre', 'tipo_cultivo__nombre')
 
-# Venta y Distribución
+#####################################
+# ADMINISTRACIÓN DE VENTAS
+#####################################
+
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):
+    """Configuración de la vista de administración para Clientes"""
     list_display = ('nombre', 'tipo', 'ruc_dni', 'telefono', 'email')
     search_fields = ('nombre', 'ruc_dni')
     list_filter = ('tipo',)
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
+    """Configuración de la vista de administración para Pedidos"""
     list_display = ('codigo', 'cliente', 'fecha_pedido', 'fecha_entrega_solicitada', 'estado')
     search_fields = ('codigo', 'cliente__nombre')
     list_filter = ('estado', 'fecha_pedido')
 
 @admin.register(ProductoTerminado)
 class ProductoTerminadoAdmin(admin.ModelAdmin):
+    """Configuración de la vista de administración para Productos Terminados"""
     list_display = ('codigo', 'cultivo', 'categoria_calidad', 'cantidad', 'precio_unitario')
     search_fields = ('codigo', 'cultivo__variedad__nombre')
     list_filter = ('categoria_calidad',)
 
 @admin.register(Factura)
 class FacturaAdmin(admin.ModelAdmin):
+    """Configuración de la vista de administración para Facturas"""
     list_display = ('numero', 'pedido', 'fecha_emision', 'total', 'estado')
     search_fields = ('numero', 'pedido__codigo')
     list_filter = ('estado', 'fecha_emision')
 
-# Gestión de Recursos
+#####################################
+# ADMINISTRACIÓN DE RECURSOS
+#####################################
+
 @admin.register(Trabajador)
 class TrabajadorAdmin(admin.ModelAdmin):
+    """Configuración de la vista de administración para Trabajadores"""
     list_display = ('codigo', 'nombre_completo', 'cargo', 'telefono', 'estado')
     search_fields = ('codigo', 'nombre_completo', 'documento_identidad')
     list_filter = ('estado', 'cargo')
 
 @admin.register(Maquinaria)
 class MaquinariaAdmin(admin.ModelAdmin):
+    """Configuración de la vista de administración para Maquinaria"""
     list_display = ('codigo', 'categoria', 'marca', 'modelo', 'estado')
     search_fields = ('codigo', 'marca', 'modelo')
     list_filter = ('estado', 'categoria')
 
 @admin.register(CostoOperativo)
 class CostoOperativoAdmin(admin.ModelAdmin):
+    """Configuración de la vista de administración para Costos Operativos"""
     list_display = ('codigo', 'tipo', 'fecha', 'monto', 'cultivo')
     search_fields = ('codigo', 'descripcion')
     list_filter = ('tipo', 'fecha')
 
-# Registrar el resto de modelos con configuración básica
+#####################################
+# REGISTRO DE MODELOS ADICIONALES
+#####################################
+
+# Registro simple de modelos auxiliares
 admin.site.register(AnalisisSuelo)
 admin.site.register(SistemaRiego)
 admin.site.register(FuenteAgua)
